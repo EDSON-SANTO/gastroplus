@@ -113,7 +113,8 @@ function RestaurantPage() {
   }
 
   const waNumber = (restaurant.whatsapp || restaurant.phone || "").replace(/\D/g, "");
-  const waUrl = waNumber ? `https://wa.me/${waNumber}?text=${encodeURIComponent(`Olá! Vi o vosso restaurante "${restaurant.name}" na Sabores e gostaria de mais informações.`)}` : null;
+  const waUrl = waNumber ? `https://wa.me/${waNumber}?text=${encodeURIComponent(`Olá, gostaria de fazer um pedido do restaurante ${restaurant.name}`)}` : null;
+  const fmtPrice = (v: number) => `${Number(v).toLocaleString("pt-PT", { maximumFractionDigits: 0 })} Kz`;
 
   return (
     <>
