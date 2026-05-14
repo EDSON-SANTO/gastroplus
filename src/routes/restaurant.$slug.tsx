@@ -225,7 +225,7 @@ function RestaurantPage() {
           <DialogHeader>
             <DialogTitle>{infoItem?.name}</DialogTitle>
             <DialogDescription className="text-base font-semibold text-primary">
-              {infoItem && Number(infoItem.price).toFixed(2)} €
+              {infoItem && fmtPrice(infoItem.price)}
             </DialogDescription>
           </DialogHeader>
           {infoItem?.description && <p className="text-sm text-muted-foreground">{infoItem.description}</p>}
