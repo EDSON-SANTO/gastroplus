@@ -64,9 +64,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Sabores — Descubra restaurantes perto de si" },
+      { title: "Gastro+ — Descubra restaurantes perto de si" },
       { name: "description", content: "Descubra restaurantes, explore menus digitais leves e contacte por WhatsApp num clique." },
-      { property: "og:title", content: "Sabores — Descubra restaurantes" },
+      { property: "og:title", content: "Gastro+ — Descubra restaurantes" },
       { property: "og:description", content: "Menus digitais leves, fotos de pratos e contacto rápido por WhatsApp." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
