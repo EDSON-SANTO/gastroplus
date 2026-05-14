@@ -121,7 +121,7 @@ function RestaurantPage() {
       {/* Cover */}
       <div className="relative h-48 w-full overflow-hidden bg-muted sm:h-64">
         {restaurant.cover_image ? (
-          <img src={restaurant.cover_image} alt={restaurant.name} className="h-full w-full object-cover" />
+          <img src={restaurant.cover_image} alt={restaurant.name} loading="eager" decoding="async" className="h-full w-full object-cover" />
         ) : (
           <div className="h-full w-full bg-hero" />
         )}
