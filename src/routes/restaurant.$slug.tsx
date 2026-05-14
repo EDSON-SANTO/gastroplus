@@ -175,7 +175,7 @@ function RestaurantPage() {
                       <li key={it.id} className="flex items-center justify-between gap-3 p-3 sm:p-4">
                         <div className="min-w-0 flex-1">
                           <p className="truncate font-medium">{it.name}</p>
-                          <p className="text-sm font-semibold text-primary">{Number(it.price).toFixed(2)} €</p>
+                          <p className="text-sm font-semibold text-primary">{fmtPrice(it.price)}</p>
                         </div>
                         <div className="flex shrink-0 items-center gap-1">
                           <Button size="sm" variant="ghost" onClick={() => setInfoItem(it)} aria-label="Ver descrição">
