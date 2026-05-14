@@ -245,7 +245,7 @@ function RestaurantPage() {
             <DialogTitle>{viewItem?.name}</DialogTitle>
           </DialogHeader>
           {viewItem?.image && (
-            <img src={viewItem.image} alt={viewItem.name} className="mx-auto max-h-[70vh] w-full rounded-lg object-contain" />
+            <img src={viewItem.image} alt={viewItem.name} loading="lazy" decoding="async" className="mx-auto max-h-[70vh] w-full rounded-lg object-contain" />
           )}
         </DialogContent>
       </Dialog>
