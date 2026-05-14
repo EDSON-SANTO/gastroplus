@@ -113,14 +113,15 @@ function RestaurantPage() {
   }
 
   const waNumber = (restaurant.whatsapp || restaurant.phone || "").replace(/\D/g, "");
-  const waUrl = waNumber ? `https://wa.me/${waNumber}?text=${encodeURIComponent(`Olá! Vi o vosso restaurante "${restaurant.name}" na Sabores e gostaria de mais informações.`)}` : null;
+  const waUrl = waNumber ? `https://wa.me/${waNumber}?text=${encodeURIComponent(`Olá, gostaria de fazer um pedido do restaurante ${restaurant.name}`)}` : null;
+  const fmtPrice = (v: number) => `${Number(v).toLocaleString("pt-PT", { maximumFractionDigits: 0 })} Kz`;
 
   return (
     <>
       {/* Cover */}
       <div className="relative h-48 w-full overflow-hidden bg-muted sm:h-64">
         {restaurant.cover_image ? (
-          <img src={restaurant.cover_image} alt={restaurant.name} className="h-full w-full object-cover" />
+          <img src={restaurant.cover_image} alt={restaurant.name} loading="eager" decoding="async" className="h-full w-full object-cover" />
         ) : (
           <div className="h-full w-full bg-hero" />
         )}
@@ -174,7 +175,7 @@ function RestaurantPage() {
                       <li key={it.id} className="flex items-center justify-between gap-3 p-3 sm:p-4">
                         <div className="min-w-0 flex-1">
                           <p className="truncate font-medium">{it.name}</p>
-                          <p className="text-sm font-semibold text-primary">{Number(it.price).toFixed(2)} €</p>
+                          <p className="text-sm font-semibold text-primary">{fmtPrice(it.price)}</p>
                         </div>
                         <div className="flex shrink-0 items-center gap-1">
                           <Button size="sm" variant="ghost" onClick={() => setInfoItem(it)} aria-label="Ver descrição">
@@ -224,7 +225,7 @@ function RestaurantPage() {
           <DialogHeader>
             <DialogTitle>{infoItem?.name}</DialogTitle>
             <DialogDescription className="text-base font-semibold text-primary">
-              {infoItem && Number(infoItem.price).toFixed(2)} €
+              {infoItem && fmtPrice(infoItem.price)}
             </DialogDescription>
           </DialogHeader>
           {infoItem?.description && <p className="text-sm text-muted-foreground">{infoItem.description}</p>}
@@ -244,7 +245,7 @@ function RestaurantPage() {
             <DialogTitle>{viewItem?.name}</DialogTitle>
           </DialogHeader>
           {viewItem?.image && (
-            <img src={viewItem.image} alt={viewItem.name} className="mx-auto max-h-[70vh] w-full rounded-lg object-contain" />
+            <img src={viewItem.image} alt={viewItem.name} loading="lazy" decoding="async" className="mx-auto max-h-[70vh] w-full rounded-lg object-contain" />
           )}
         </DialogContent>
       </Dialog>
