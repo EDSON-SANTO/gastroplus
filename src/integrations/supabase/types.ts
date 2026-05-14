@@ -222,11 +222,15 @@ export type Database = {
           address: string | null
           cover_image: string | null
           created_at: string
+          delivery_time: string | null
           description: string | null
           id: string
+          is_featured: boolean
+          logo: string | null
           name: string
           owner_id: string
           phone: string | null
+          rating: number | null
           slug: string
           status: string
           whatsapp: string | null
@@ -235,11 +239,15 @@ export type Database = {
           address?: string | null
           cover_image?: string | null
           created_at?: string
+          delivery_time?: string | null
           description?: string | null
           id?: string
+          is_featured?: boolean
+          logo?: string | null
           name: string
           owner_id: string
           phone?: string | null
+          rating?: number | null
           slug: string
           status?: string
           whatsapp?: string | null
@@ -248,11 +256,15 @@ export type Database = {
           address?: string | null
           cover_image?: string | null
           created_at?: string
+          delivery_time?: string | null
           description?: string | null
           id?: string
+          is_featured?: boolean
+          logo?: string | null
           name?: string
           owner_id?: string
           phone?: string | null
+          rating?: number | null
           slug?: string
           status?: string
           whatsapp?: string | null
