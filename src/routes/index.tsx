@@ -10,7 +10,7 @@ import heroImg from "@/assets/hero-food.jpg";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Sabores — Descubra restaurantes e menus digitais" },
+      { title: "Gastro+ — Descubra restaurantes e menus digitais" },
       { name: "description", content: "Pesquise restaurantes, veja menus leves com fotos e preços, e contacte por WhatsApp." },
     ],
   }),
@@ -25,8 +25,9 @@ function Index() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("restaurants")
-        .select("id, name, slug, description, address, cover_image")
+        .select("id, name, slug, description, address, cover_image, rating, delivery_time, is_featured")
         .eq("status", "approved")
+        .order("is_featured", { ascending: false })
         .order("created_at", { ascending: false })
         .limit(24);
       if (error) throw error;
@@ -117,7 +118,11 @@ function Index() {
                     <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">{r.description}</p>
                   )}
                   <div className="mt-3 flex items-center gap-3 text-xs text-muted-foreground">
-                    <span className="inline-flex items-center gap-1"><Star className="h-3.5 w-3.5 fill-primary text-primary" /> Novo</span>
+                    <span className="inline-flex items-center gap-1">
+                      <Star className="h-3.5 w-3.5 fill-primary text-primary" />
+                      {r.rating && Number(r.rating) > 0 ? Number(r.rating).toFixed(1) : "Novo"}
+                    </span>
+                    {r.delivery_time && <span className="inline-flex items-center gap-1">⏱ {r.delivery_time}</span>}
                     <span className="inline-flex items-center gap-1 text-whatsapp"><MessageCircle className="h-3.5 w-3.5" /> WhatsApp</span>
                   </div>
                 </div>

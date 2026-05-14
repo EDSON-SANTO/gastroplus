@@ -13,7 +13,7 @@ export function SiteHeader() {
           <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-hero text-primary-foreground shadow-warm">
             <UtensilsCrossed className="h-4 w-4" />
           </span>
-          <span>Sabores</span>
+          <span>Gastro+</span>
         </Link>
 
         <nav className="flex items-center gap-1">
