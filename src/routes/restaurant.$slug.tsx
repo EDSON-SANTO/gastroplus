@@ -132,7 +132,7 @@ function RestaurantPage() {
       </div>
 
       <div className="mx-auto max-w-3xl px-4 pb-32">
-        <div className="-mt-10 rounded-2xl border border-border bg-card p-5 shadow-warm">
+        <div className="relative z-10 -mt-10 rounded-2xl border border-border bg-card p-5 shadow-warm">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
               <h1 className="font-display text-2xl font-bold sm:text-3xl">{restaurant.name}</h1>
