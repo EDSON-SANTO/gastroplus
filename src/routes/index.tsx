@@ -1,10 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Search, MapPin, MessageCircle, Star } from "lucide-react";
-import { useState } from "react";
+import { Search, MapPin, MessageCircle, Star, SlidersHorizontal } from "lucide-react";
+import { useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import heroImg from "@/assets/hero-food.jpg";
 
 export const Route = createFileRoute("/")({
@@ -19,6 +20,8 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const [q, setQ] = useState("");
+  const [onlyFeatured, setOnlyFeatured] = useState(false);
+  const [sort, setSort] = useState<"recent" | "rating">("recent");
 
   const { data: restaurants, isLoading } = useQuery({
     queryKey: ["restaurants", "approved"],
@@ -27,17 +30,26 @@ function Index() {
         .from("restaurants")
         .select("id, name, slug, description, address, cover_image, rating, delivery_time, is_featured")
         .eq("status", "approved")
-        .order("is_featured", { ascending: false })
-        .order("created_at", { ascending: false })
-        .limit(24);
+        .limit(60);
       if (error) throw error;
       return data;
     },
   });
 
-  const filtered = (restaurants ?? []).filter((r) =>
-    !q || r.name.toLowerCase().includes(q.toLowerCase()) || (r.address ?? "").toLowerCase().includes(q.toLowerCase())
-  );
+  const filtered = useMemo(() => {
+    let list = (restaurants ?? []).slice();
+    const term = q.trim().toLowerCase();
+    if (term) list = list.filter((r) => r.name.toLowerCase().includes(term) || (r.address ?? "").toLowerCase().includes(term) || (r.description ?? "").toLowerCase().includes(term));
+    if (onlyFeatured) list = list.filter((r) => r.is_featured);
+    list.sort((a, b) => {
+      if (sort === "rating") return Number(b.rating ?? 0) - Number(a.rating ?? 0);
+      return 0; // already by recency from DB after we re-sort below
+    });
+    if (sort === "recent") {
+      list.sort((a, b) => (b.is_featured === a.is_featured ? 0 : b.is_featured ? 1 : -1));
+    }
+    return list;
+  }, [restaurants, q, onlyFeatured, sort]);
 
   return (
     <>
@@ -64,32 +76,48 @@ function Index() {
                 className="h-11 border-0 pl-9 text-base focus-visible:ring-0"
               />
             </div>
-            <Button size="lg" className="h-11 bg-primary text-primary-foreground hover:opacity-90">Procurar</Button>
           </div>
         </div>
       </section>
 
       {/* LIST */}
       <section className="mx-auto max-w-6xl px-4 py-10 sm:py-14">
-        <div className="mb-6 flex items-end justify-between">
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h2 className="font-display text-2xl font-bold sm:text-3xl">Restaurantes em destaque</h2>
-            <p className="text-sm text-muted-foreground">Os locais mais recentes da nossa comunidade.</p>
+            <h2 className="font-display text-2xl font-bold sm:text-3xl">Restaurantes</h2>
+            <p className="text-sm text-muted-foreground">{filtered.length} encontrado(s)</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant={onlyFeatured ? "default" : "outline"}
+              size="sm"
+              onClick={() => setOnlyFeatured((v) => !v)}
+              className={onlyFeatured ? "bg-primary text-primary-foreground" : ""}
+            >
+              <Star className="mr-1.5 h-3.5 w-3.5" />Em destaque
+            </Button>
+            <select
+              value={sort}
+              onChange={(e) => setSort(e.target.value as any)}
+              className="h-9 rounded-md border border-input bg-background px-2 text-sm"
+            >
+              <option value="recent">Mais recentes</option>
+              <option value="rating">Melhor avaliados</option>
+            </select>
           </div>
         </div>
 
         {isLoading ? (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="h-48 animate-pulse rounded-xl bg-muted" />
+              <Skeleton key={i} className="h-64 rounded-xl" />
             ))}
           </div>
         ) : filtered.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-border bg-warm p-10 text-center">
-            <p className="font-display text-lg font-semibold">Ainda sem restaurantes aprovados</p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Volte em breve — novos sabores chegam todos os dias.
-            </p>
+            <SlidersHorizontal className="mx-auto h-8 w-8 text-muted-foreground" />
+            <p className="mt-3 font-display text-lg font-semibold">Nenhum resultado</p>
+            <p className="mt-1 text-sm text-muted-foreground">Ajuste a pesquisa ou os filtros.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -100,11 +128,16 @@ function Index() {
                 params={{ slug: r.slug }}
                 className="group overflow-hidden rounded-xl border border-border bg-card shadow-card transition-all hover:-translate-y-0.5 hover:shadow-warm"
               >
-                <div className="aspect-[16/10] overflow-hidden bg-muted">
+                <div className="relative aspect-[16/10] overflow-hidden bg-muted">
                   {r.cover_image ? (
                     <img src={r.cover_image} alt={r.name} loading="lazy" className="h-full w-full object-cover transition-transform group-hover:scale-105" />
                   ) : (
                     <div className="h-full w-full bg-hero opacity-80" />
+                  )}
+                  {r.is_featured && (
+                    <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground shadow-card">
+                      <Star className="h-3 w-3 fill-current" />Destaque
+                    </span>
                   )}
                 </div>
                 <div className="p-4">

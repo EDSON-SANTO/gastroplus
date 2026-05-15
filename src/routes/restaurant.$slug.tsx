@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, useMemo } from "react";
 import { ArrowLeft, MapPin, Phone, MessageCircle, Info, Eye, Heart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -26,6 +26,7 @@ interface MenuItem {
 function RestaurantPage() {
   const { slug } = Route.useParams();
   const { user } = useAuth();
+  const qc = useQueryClient();
   const [infoItem, setInfoItem] = useState<MenuItem | null>(null);
   const [viewItem, setViewItem] = useState<MenuItem | null>(null);
 
@@ -88,14 +89,31 @@ function RestaurantPage() {
     return out;
   }, [categories, items]);
 
+  const { data: isFav } = useQuery({
+    queryKey: ["fav", user?.id, restaurant?.id],
+    enabled: !!user && !!restaurant?.id,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("favorites").select("restaurant_id")
+        .eq("user_id", user!.id).eq("restaurant_id", restaurant!.id).maybeSingle();
+      return !!data;
+    },
+  });
+
   const toggleFavorite = async () => {
-    if (!user) {
-      toast.info("Inicie sessão para guardar favoritos.");
-      return;
-    }
+    if (!user) { toast.info("Inicie sessão para guardar favoritos."); return; }
     if (!restaurant) return;
-    const { error } = await supabase.from("favorites").insert({ user_id: user.id, restaurant_id: restaurant.id });
-    if (error) toast.error("Erro ao guardar."); else toast.success("Adicionado aos favoritos!");
+    if (isFav) {
+      const { error } = await supabase.from("favorites").delete().eq("user_id", user.id).eq("restaurant_id", restaurant.id);
+      if (error) return toast.error("Erro ao remover.");
+      toast.success("Removido dos favoritos.");
+    } else {
+      const { error } = await supabase.from("favorites").insert({ user_id: user.id, restaurant_id: restaurant.id });
+      if (error) return toast.error("Erro ao guardar.");
+      toast.success("Adicionado aos favoritos!");
+    }
+    qc.invalidateQueries({ queryKey: ["fav", user.id, restaurant.id] });
+    qc.invalidateQueries({ queryKey: ["favorites", user.id] });
   };
 
   if (isLoading) {
@@ -143,7 +161,7 @@ function RestaurantPage() {
               )}
             </div>
             <Button variant="ghost" size="icon" onClick={toggleFavorite} aria-label="Adicionar aos favoritos">
-              <Heart className="h-5 w-5" />
+              <Heart className={`h-5 w-5 ${isFav ? "fill-primary text-primary" : ""}`} />
             </Button>
           </div>
           {restaurant.description && (
