@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, useMemo } from "react";
 import { ArrowLeft, MapPin, Phone, MessageCircle, Info, Eye, Heart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -26,6 +26,7 @@ interface MenuItem {
 function RestaurantPage() {
   const { slug } = Route.useParams();
   const { user } = useAuth();
+  const qc = useQueryClient();
   const [infoItem, setInfoItem] = useState<MenuItem | null>(null);
   const [viewItem, setViewItem] = useState<MenuItem | null>(null);
 
