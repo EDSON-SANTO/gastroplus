@@ -1,10 +1,11 @@
 import { Link } from "@tanstack/react-router";
-import { UtensilsCrossed, Heart, LogIn, LogOut, User as UserIcon } from "lucide-react";
+import { UtensilsCrossed, Heart, LogIn, LogOut, User as UserIcon, LayoutDashboard, Shield } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 
 export function SiteHeader() {
-  const { user, signOut } = useAuth();
+  const { user, signOut, roles } = useAuth();
+  const isAdmin = roles.includes("admin");
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border/60 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -19,11 +20,19 @@ export function SiteHeader() {
         <nav className="flex items-center gap-1">
           {user ? (
             <>
+              {isAdmin && (
+                <Button asChild variant="ghost" size="sm">
+                  <Link to="/admin"><Shield className="mr-1.5 h-4 w-4" />Admin</Link>
+                </Button>
+              )}
               <Button asChild variant="ghost" size="sm">
-                <Link to="/favorites"><Heart className="mr-1.5 h-4 w-4" />Favoritos</Link>
+                <Link to="/dashboard"><LayoutDashboard className="mr-1.5 h-4 w-4" /><span className="hidden sm:inline">Painel</span></Link>
+              </Button>
+              <Button asChild variant="ghost" size="sm">
+                <Link to="/favorites"><Heart className="mr-1.5 h-4 w-4" /><span className="hidden sm:inline">Favoritos</span></Link>
               </Button>
               <Button variant="ghost" size="sm" onClick={() => signOut()}>
-                <LogOut className="mr-1.5 h-4 w-4" />Sair
+                <LogOut className="h-4 w-4" />
               </Button>
             </>
           ) : (
