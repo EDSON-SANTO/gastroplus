@@ -88,14 +88,31 @@ function RestaurantPage() {
     return out;
   }, [categories, items]);
 
+  const { data: isFav } = useQuery({
+    queryKey: ["fav", user?.id, restaurant?.id],
+    enabled: !!user && !!restaurant?.id,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("favorites").select("restaurant_id")
+        .eq("user_id", user!.id).eq("restaurant_id", restaurant!.id).maybeSingle();
+      return !!data;
+    },
+  });
+
   const toggleFavorite = async () => {
-    if (!user) {
-      toast.info("Inicie sessão para guardar favoritos.");
-      return;
-    }
+    if (!user) { toast.info("Inicie sessão para guardar favoritos."); return; }
     if (!restaurant) return;
-    const { error } = await supabase.from("favorites").insert({ user_id: user.id, restaurant_id: restaurant.id });
-    if (error) toast.error("Erro ao guardar."); else toast.success("Adicionado aos favoritos!");
+    if (isFav) {
+      const { error } = await supabase.from("favorites").delete().eq("user_id", user.id).eq("restaurant_id", restaurant.id);
+      if (error) return toast.error("Erro ao remover.");
+      toast.success("Removido dos favoritos.");
+    } else {
+      const { error } = await supabase.from("favorites").insert({ user_id: user.id, restaurant_id: restaurant.id });
+      if (error) return toast.error("Erro ao guardar.");
+      toast.success("Adicionado aos favoritos!");
+    }
+    qc.invalidateQueries({ queryKey: ["fav", user.id, restaurant.id] });
+    qc.invalidateQueries({ queryKey: ["favorites", user.id] });
   };
 
   if (isLoading) {
