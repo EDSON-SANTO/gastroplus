@@ -161,7 +161,7 @@ function RestaurantPage() {
               )}
             </div>
             <Button variant="ghost" size="icon" onClick={toggleFavorite} aria-label="Adicionar aos favoritos">
-              <Heart className="h-5 w-5" />
+              <Heart className={`h-5 w-5 ${isFav ? "fill-primary text-primary" : ""}`} />
             </Button>
           </div>
           {restaurant.description && (
