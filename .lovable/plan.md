@@ -1,24 +1,51 @@
-# Redefinir senhas (Demo Owner + friends)
+# Relatório técnico académico — Sabores/Gastro+
 
-Como senhas ficam apenas como hash bcrypt, é necessário **sobrescrevê-las** usando a API admin do Supabase (service role). Não é possível ler as antigas.
+Vou gerar **um único ficheiro Markdown** (`/mnt/documents/relatorio-tecnico-sabores.md`) com texto académico formal em PT-PT, pronto para copiar para o TCC. Sem alterações ao código do projeto.
 
-## Novas senhas propostas (fáceis)
+## Conteúdo do documento
 
-| Usuário | Email | Nova senha |
-|---|---|---|
-| Demo Owner (admin) | demo-owner@sabores.local | `admin123` |
-| friends (owner) | teste@gmail.com | `amigos123` |
+1. **Identificação do projeto** — nome, propósito (plataforma web para descoberta e gestão de restaurantes), tipo de aplicação (web full-stack SSR responsiva mobile-first).
 
-## Como será feito
+2. **Arquitectura geral** — diagrama ASCII:
+   ```
+   Browser (React 19 SSR)
+        │
+        ▼
+   TanStack Start (Cloudflare Workers — edge runtime)
+        │  ├─ Server Functions (createServerFn)
+        │  └─ Server Routes (/api/*)
+        ▼
+   Lovable Cloud  ──▶  PostgreSQL  +  Auth  +  Storage
+                       (RLS + roles)
+   ```
 
-1. Criar server function única e descartável `src/lib/admin-reset.functions.ts` usando `supabaseAdmin.auth.admin.updateUserById(id, { password })`.
-2. Executar uma vez via `invoke-server-function` para cada usuário.
-3. Remover o arquivo após confirmação (medida de segurança — não deixar endpoint de reset aberto no código).
-4. Confirmar fazendo login de teste com as novas credenciais.
+3. **Stack tecnológica** (tabela com versão e justificação académica de cada escolha):
+   - Linguagem: TypeScript 5.8 (strict)
+   - Framework: TanStack Start 1.x (SSR, file-based routing, type-safe)
+   - UI: React 19, Tailwind CSS 4, shadcn/ui (Radix UI), lucide-react
+   - Estado servidor: TanStack Query 5
+   - Formulários: react-hook-form + zod
+   - Backend-as-a-Service: Lovable Cloud (Supabase) — PostgreSQL, Auth, Storage
+   - Cliente BD: @supabase/supabase-js 2
+   - Hospedagem: Cloudflare Workers (edge)
+   - Build: Vite 7
 
-## Observações
+4. **Modelo de dados** — descrição das 9 tabelas:
+   `profiles`, `user_roles`, `restaurants`, `restaurant_images`, `menu_categories`, `menu_items`, `promotions`, `reviews`, `favorites`.
 
-- As senhas escolhidas são fracas e adequadas apenas para ambiente de demonstração. Para produção, recomendo trocar por senhas fortes ou usar o fluxo `/forgot-password`.
-- Os emails, perfis e roles **não serão alterados** — apenas a senha.
+5. **Segurança** — Row-Level Security, separação de roles em tabela `user_roles` com função `has_role()` SECURITY DEFINER (justificação: prevenção de escalada de privilégios), autenticação via JWT gerido pelo Supabase Auth.
 
-Confirme (ou troque as senhas sugeridas) para eu implementar.
+6. **Funcionalidades implementadas** — autenticação (registo/login/recuperação), CRUD de restaurantes com fluxo de aprovação (pending → approved/rejected), editor de menus, favoritos, painel do proprietário, painel administrativo, upload de imagens, integração WhatsApp por deep-link.
+
+7. **Justificação académica das escolhas** — vantagens de SSR vs SPA, edge computing, BaaS vs backend monolítico, design system com tokens semânticos OKLCH, acessibilidade via Radix.
+
+8. **Ferramentas de suporte** — Lovable (geração assistida por IA), GitHub (versionamento), VS Code, Figma (opcional).
+
+9. **Limitações e trabalho futuro** — secção curta a referir possíveis evoluções (app nativo, IA conversacional, visualizações 3D) sem afirmar que existem.
+
+10. **Anexo A: `package.json`** — bloco de código completo.
+11. **Anexo B: lista de rotas** — `/`, `/login`, `/register`, `/forgot-password`, `/reset-password`, `/restaurant/:slug`, `/dashboard`, `/admin`, `/favorites`.
+
+## Entrega
+
+Vou emitir uma `<presentation-artifact>` para descarregares o `.md`. Se preferires também em `.pdf`, diz no próximo turno e converto.
